@@ -8,7 +8,6 @@ import amf.core.remote._
 import amf.core.unsafe.PlatformSecrets
 import amf.core.utils.AmfStrings
 import amf.plugins.document.webapi.JsonSchemaPlugin
-import amf.plugins.document.webapi.contexts.parser.OasLikeWebApiContext
 import amf.plugins.document.webapi.contexts.parser.oas.{JsonSchemaAstIndex, OasWebApiContext}
 import amf.plugins.document.webapi.parser.spec._
 import amf.plugins.document.webapi.parser.spec.declaration.{
@@ -50,7 +49,7 @@ abstract class WebApiContext(val loc: String,
     case _                  => None
   }
 
-  var jsonSchemaRefGuide = JsonSchemaRefGuide(loc, refs)(this)
+  var jsonSchemaRefGuide: JsonSchemaRefGuide = JsonSchemaRefGuide(loc, refs)(this)
 
   def setJsonSchemaAST(value: YNode): Unit = {
     localJSONSchemaContext = Some(value)
@@ -174,13 +173,13 @@ abstract class WebApiContext(val loc: String,
           if (ignore(shape, key)) {
             // annotation or path in endpoint/webapi => ignore
           } else if (!properties(key)) {
-            eh.violation(ClosedShapeSpecification,
-                         node,
-                         s"Property '$key' not supported in a $vendor $shape node",
-                         entry)
+            throwClosedShapeError(node, s"Property '$key' not supported in a $vendor $shape node", entry)
           }
         }
       case None =>
-        eh.violation(ClosedShapeSpecification, node, s"Cannot validate unknown node type $shape for $vendor", ast)
+        throwClosedShapeError(node, s"Cannot validate unknown node type $shape for $vendor", ast)
     }
+
+  protected def throwClosedShapeError(node: String, message: String, entry: YPart): Unit =
+    eh.violation(ClosedShapeSpecification, node, message, entry)
 }
