@@ -24,10 +24,10 @@ object OasSecuritySchemeParser {
 case class OasSecuritySchemeParser(part: YPart, adopt: SecurityScheme => SecurityScheme)(
     implicit ctx: OasLikeWebApiContext)
     extends OasLikeSecuritySchemeParser(part, adopt) {
-  override def closedShape(scheme: SecurityScheme, map: YMap): Unit = {
+  override def closedShape(scheme: SecurityScheme, map: YMap, shape: String): Unit = {
     val key = map.key("type").map(_.value.as[String]) match {
       case Some("basic") => "basic"
-      case _             => "securityScheme"
+      case _             => shape
     }
     ctx.closedShape(scheme.id, map, key)
   }

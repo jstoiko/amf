@@ -6,7 +6,7 @@ import amf.plugins.document.webapi.parser.spec.SpecSyntax
 import amf.validation.DialectValidations.ClosedShapeSpecification
 import org.yaml.model.{YMap, YNode, YPart, YScalar}
 
-class CustomClosedShapeContextDecorator(decorator: OasLikeWebApiContext, specSyntax: SpecSyntax)
+class CustomClosedShapeContextDecorator(decorator: OasLikeWebApiContext, syntaxOverride: SpecSyntax)
     extends OasLikeWebApiContext(
       decorator.loc,
       decorator.refs,
@@ -14,7 +14,7 @@ class CustomClosedShapeContextDecorator(decorator: OasLikeWebApiContext, specSyn
       decorator,
       Some(decorator.declarations)
     ) {
-  override val syntax: SpecSyntax = specSyntax
+  override val syntax: SpecSyntax = syntaxOverride
   override val vendor: Vendor     = decorator.vendor
 
   override def link(node: YNode): Either[String, YNode] = decorator.link(node)
